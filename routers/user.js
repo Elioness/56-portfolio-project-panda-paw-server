@@ -46,4 +46,100 @@ router.get("/", auth, async (req, res, next) => {
   }
 });
 
+//POST sumbit transpo calculation
+
+router.post("/submitEmissionTranspo", auth, async (req, res, next) => {
+  console.log("Trying to post a new transpo cal");
+  try {
+    //These are the attributes of a new transpo emission I want to fill in
+    const {
+      title,
+      footBikeDistance,
+      trainDistance,
+      carDistance,
+      planeDistance,
+      footBikeDays,
+      trainDays,
+      carDays,
+      planeDays,
+    } = req.body;
+    const userId = req.user.id;
+    console.log("user id", userId);
+    //console.log("user id", userId);
+
+    const newTranspoCalculation = await TranspoFootprint.create({
+      title: title,
+      footBikeDistance: footBikeDistance,
+      trainDistance: trainDistance,
+      carDistance: carDistance,
+      planeDistance: planeDistance,
+      footBikeDays: footBikeDays,
+      trainDays: trainDays,
+      carDays: carDays,
+      planeDays: planeDays,
+      userId: userId,
+    });
+    res.send(newTranspoCalculation);
+  } catch (e) {
+    next(e);
+  }
+});
+
+//POST sumbit electricity calculation
+router.post("/submitEmissionElectricity", auth, async (req, res, next) => {
+  console.log("Trying to post a new elec cal");
+  try {
+    const { consumption } = req.body;
+    const userId = req.user.id;
+    console.log("user id", userId);
+
+    const newElectricityCalculation = await ElectricityFootprint.create({
+      consumption: consumption,
+      userId: userId,
+    });
+    res.send(newElectricityCalculation);
+  } catch (e) {
+    next(e);
+  }
+});
+
+//POST sumbit plant offset calculation
+router.post("/submitPlantOffset", auth, async (req, res, next) => {
+  console.log("Trying to post a new plant cal");
+  try {
+    const { plants } = req.body;
+    const userId = req.user.id;
+    console.log("user id", userId);
+
+    const newPlantCalculation = await PlantOffset.create({
+      plants: plants,
+      userId: userId,
+    });
+    res.send(newPlantCalculation);
+  } catch (e) {
+    next(e);
+  }
+});
+
+//Patch Goal
+router.patch("/:newGoal", auth, async (req, res, next) => {
+  try {
+    const newGoal = req.params.newGoal;
+    const userId = req.user.id;
+    const user = await User.findByPk(userId);
+
+    console.log("user", user);
+    if (!user) {
+      return res.status(500).send("User not found");
+    }
+    console.log("newGoal", newGoal);
+    await user.update({ goal: newGoal });
+
+    res.send(user.goal);
+  } catch (e) {
+    console.log(e.message);
+    next(e);
+  }
+});
+
 module.exports = router;

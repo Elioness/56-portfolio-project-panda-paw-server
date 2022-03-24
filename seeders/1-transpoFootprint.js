@@ -21,7 +21,7 @@ module.exports = {
         },
 
         {
-          userId: 2,
+          userId: 1,
           title: "Office Transpo",
           footBikeDistance: 6,
           trainDistance: 0,
