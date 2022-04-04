@@ -1,4 +1,4 @@
-const express = require("express");
+//const express = require("express");
 const { Router } = require("express");
 const router = new Router();
 
@@ -47,7 +47,6 @@ router.get("/", auth, async (req, res, next) => {
 });
 
 //POST sumbit transpo calculation
-
 router.post("/submitEmissionTranspo", auth, async (req, res, next) => {
   console.log("Trying to post a new transpo cal");
   try {
@@ -130,7 +129,7 @@ router.patch("/:newGoal", auth, async (req, res, next) => {
 
     console.log("user", user);
     if (!user) {
-      return res.status(500).send("User not found");
+      return res.status(404).send("User not found");
     }
     console.log("newGoal", newGoal);
     await user.update({ goal: newGoal });
@@ -138,6 +137,26 @@ router.patch("/:newGoal", auth, async (req, res, next) => {
     res.send(user.goal);
   } catch (e) {
     console.log(e.message);
+    next(e);
+  }
+});
+
+//DELETE Reservations
+router.delete("/deleteTranspoFootprint", auth, async (req, res, next) => {
+  console.log("IamHERE");
+  try {
+    const transpoFootprintId = req.user.userEmissions.transpoFootprints.id;
+    const transpoFootprint = await TranspoFootprint.findByPk(
+      transpoFootprintId
+    );
+
+    if (!transpoFootprintId) {
+      return res.status(404).send("Does not exist");
+    }
+
+    await transpoFootprint.destroy();
+    res.send(`This transpoFootprint has been deleted: ${transpoFootprintId}`);
+  } catch (e) {
     next(e);
   }
 });
